@@ -10,7 +10,121 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl= env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// -----------------------------
+// Plan (계획)
+// -----------------------------
+model Plan {
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  startDate       DateTime?     @db.Date
+  endDate         DateTime?     @db.Date
+  priority        Int           @default(3) // 1(높음) ~ 5(낮음)
+  successCriteria String?       // 성공 기준
+  estimatedMinutes Int?         // 예상 시간 (분 단위)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  versions        PlanVersion[]
+  todos           Todo[]
+  reviews         Review[]
+
+  @@map("plans")
+}
+
+// -----------------------------
+// PlanVersion (계획 수정 이력) - 고쳐도 이전 내용이 남아야 함
+// -----------------------------
+model PlanVersion {
+  id              String   @id @default(cuid())
+  planId          String
+  title           String
+  description     String?
+  startDate       DateTime? @db.Date
+  endDate         DateTime? @db.Date
+  priority        Int
+  successCriteria String?
+  estimatedMinutes Int?
+  changedAt       DateTime @default(now())
+  changeNote      String?  // 왜 수정했는지 (선택)
+
+  plan            Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+  @@map("plan_versions")
+}
+
+// -----------------------------
+// Todo (할 일)
+// -----------------------------
+model Todo {
+  id               String         @id @default(cuid())
+  planId           String
+  title            String
+  description      String?
+  status           TodoStatus     @default(PENDING)
+  priority         Int            @default(3)
+  dueDate          DateTime?      @db.Date
+  tags             String[]       // PostgreSQL array
+  estimatedMinutes Int?
+  completedAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  plan             Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  executionLogs    ExecutionLog[]
+
+  @@index([planId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("todos")
+}
+
+enum TodoStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// -----------------------------
+// ExecutionLog (실제로 한 일 기록)
+// 계획/할 일을 덮어쓰지 않고 별도로 저장
+// -----------------------------
+model ExecutionLog {
+  id               String    @id @default(cuid())
+  todoId           String
+  startedAt        DateTime
+  endedAt          DateTime?
+  actualMinutes    Int?      // 실제로 걸린 시간 (분)
+  blockedReason    String?   // 막혔던 이유
+  note             String?
+  createdAt        DateTime  @default(now())
+
+  todo             Todo      @relation(fields: [todoId], references: [id], onDelete: Cascade)
+
+  @@index([todoId])
+  @@map("execution_logs")
+}
+
+// -----------------------------
+// Review (돌아보기 - 고칠 점 등)
+// -----------------------------
+model Review {
+  id              String   @id @default(cuid())
+  planId          String?
+  periodStart     DateTime? @db.Date
+  periodEnd       DateTime? @db.Date
+  improvement     String   // 다음 계획으로 넘길 고칠 점 한 줄
+  createdAt       DateTime @default(now())
+
+  plan            Plan?    @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
 }
