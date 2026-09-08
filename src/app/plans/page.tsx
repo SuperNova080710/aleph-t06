@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { createPlan } from "./actions";
-import { Plan } from "@/generated/prisma/client";
+import { Plan } from "@prisma/client";
 
 type PlanWithCount = Plan & {
     _count: {
