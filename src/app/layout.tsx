@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "플랜두씨 다이어리",
+  title: "계획 다이어리",
   description: "Plan → Do → See 다이어리",
 };
 
@@ -31,7 +31,7 @@ export default function RootLayout({
           <header className="border-b bg-white">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
               <h1 className="text-lg font-bold tracking-tight">
-                플랜두씨 다이어리
+                계획 다이어리
               </h1>
               <nav className="flex gap-4 text-sm text-zinc-600">
                 <a href="/" className="hover:text-zinc-900">
