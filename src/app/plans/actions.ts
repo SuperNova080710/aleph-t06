@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache"; 
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"; 
+import { TodoStatus } from "@prisma/client";
 
 export async function createPlan(formData: FormData) {
     const title = formData.get("title") as string;
@@ -96,4 +97,71 @@ export async function updatePlan(formData: FormData) {
     revalidatePath("/plans");
     revalidatePath(`/plans/${id}`);
     redirect(`/plans/${id}`);
+}
+
+export async function createTodo(formData: FormData) {
+    const planId = formData.get("planId") as string;
+    const title = (formData.get("title") as string)?.trim();
+    const description = (formData.get("description") as string)?.trim() || null;
+    const priority = Number(formData.get("priority") || 3);
+    const dueDate = formData.get("dueDate")
+        ? new Date(formData.get("dueDate") as string)
+        : null;
+    const estimatedMinutes = formData.get("estimatedMinutes")
+        ? Number(formData.get("estimatedMinutes"))
+        : null;
+    const tagsRaw = (formData.get("tags") as string)?.trim() || "";
+    const tags = tagsRaw
+        ? tagsRaw.split(",").map((t) => t.trim()).filter(Boolean)
+        : [];
+
+    if (!planId || !title) {
+        throw new Error("필수 값이 없습니다.");
+    }
+
+    await prisma.todo.create({
+        data: {
+            planId,
+            title,
+            description,
+            priority,
+            dueDate,
+            estimatedMinutes,
+            tags,
+        },
+    });
+
+    revalidatePath(`/plans/${planId}`);
+}
+
+export async function updateTodoStatus(formData: FormData) {
+    const id = formData.get("id") as string;
+    const planId = formData.get("planId") as string;
+    const status = formData.get("status") as TodoStatus;
+
+    if (!id || !planId || !status) {
+        throw new Error("필수 값이 없습니다.");
+    }
+
+    await prisma.todo.update({
+        where: { id },
+        data: {
+            status,
+            completedAt: status === "COMPLETED" ? new Date() : null,
+        },
+    });
+
+    revalidatePath(`/plans/${planId}`);
+}
+
+export async function deleteTodo(formData: FormData) {
+    const id = formData.get("id") as string;
+    const planId = formData.get("planId") as string;
+
+    if (!id || !planId) {
+        throw new Error("필수 값이 없습니다.");
+    }
+
+    await prisma.todo.delete({ where: { id } });
+    revalidatePath(`/plans/${planId}`);
 }
