@@ -32,11 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-900 dark:text-slate-100`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+          <div className="min-h-screen">
             <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
               <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-4">
                 <a href="/" className="flex items-center gap-2">

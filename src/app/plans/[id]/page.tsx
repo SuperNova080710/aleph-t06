@@ -97,41 +97,41 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
     return (
         <div className="space-y-10">
             <div>
-                <a href="/plans" className="text-sm text-zinc-500 hover:text-zinc-800">
+                <a href="/plans" className="text-sm text-slate-500 dark:text-slate-400 hover:text-zinc-800">
                     ← 계획 목록
                 </a>
                 <h2 className="mt-2 text-2xl font-bold tracking-tight">{plan.title}</h2>
                 {plan.description && (
-                    <p className="mt-1 text-zinc-600">{plan.description}</p>
+                    <p className="mt-1 text-slate-600 dark:text-slate-300">{plan.description}</p>
                 )}
             </div>
 
             {/* 현재 계획 정보 */}
-            <section className="rounded-xl border bg-white p-6 shadow-sm">
+            <section className="card p-6">
                 <h3 className="mb-4 font-semibold">현재 계획</h3>
                 <dl className="grid gap-3 text-sm sm:grid-cols-2">
                     <div>
-                        <dt className="text-zinc-500">우선순위</dt>
+                        <dt className="text-slate-500 dark:text-slate-400">우선순위</dt>
                         <dd className="font-medium">{plan.priority}</dd>
                     </div>
                     <div>
-                        <dt className="text-zinc-500">예상 시간</dt>
+                        <dt className="text-slate-500 dark:text-slate-400">예상 시간</dt>
                         <dd className="font-medium">
                             {plan.estimatedMinutes ? `${plan.estimatedMinutes}분` : "-"}
                         </dd>
                     </div>
                     <div>
-                        <dt className="text-zinc-500">기간</dt>
+                        <dt className="text-slate-500 dark:text-slate-400">기간</dt>
                         <dd className="font-medium">
                             {formatDate(plan.startDate) || "-"} ~ {formatDate(plan.endDate) || "-"}
                         </dd>
                     </div>
                     <div>
-                        <dt className="text-zinc-500">할 일 수</dt>
+                        <dt className="text-slate-500 dark:text-slate-400">할 일 수</dt>
                         <dd className="font-medium">{plan._count.todos}개</dd>
                     </div>
                     <div className="sm:col-span-2">
-                        <dt className="text-zinc-500">성공 기준</dt>
+                        <dt className="text-slate-500 dark:text-slate-400">성공 기준</dt>
                         <dd className="font-medium">{plan.successCriteria || "-"}</dd>
                     </div>
                 </dl>
@@ -141,7 +141,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
             <section className="space-y-4">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <h3 className="font-semibold">할 일 (Todo)</h3>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                         정렬 기준:{" "}
                         {sort === "dueDate"
                             ? "마감일 → 우선순위"
@@ -152,7 +152,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 </div>
 
                 {/* 검색 / 필터 / 정렬 */}
-                <form className="grid gap-3 rounded-xl border bg-white p-4 shadow-sm sm:grid-cols-4">
+                <form className="grid gap-3 card p-4 sm:grid-cols-4">
                     <input
                         name="q"
                         defaultValue={q}
@@ -188,7 +188,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 </form>
 
                 {/* 할 일 추가 */}
-                <div className="rounded-xl border bg-white p-6 shadow-sm">
+                <div className="card p-6">
                     <h4 className="mb-4 text-sm font-semibold">할 일 추가</h4>
                     <form action={createTodo} className="space-y-3">
                         <input type="hidden" name="planId" value={plan.id} />
@@ -262,13 +262,13 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
 
                 {/* 할 일 목록 + 실행 기록 */}
                 {todos.length === 0 ? (
-                    <p className="rounded-xl border border-dashed py-8 text-center text-sm text-zinc-500">
+                    <p className="rounded-xl border border-dashed py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                         조건에 맞는 할 일이 없습니다.
                     </p>
                 ) : (
                     <ul className="space-y-4">
                         {todos.map((todo) => (
-                            <li key={todo.id} className="rounded-xl border bg-white p-4 shadow-sm">
+                            <li key={todo.id} className="card p-4">
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-2">
@@ -276,14 +276,14 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                             <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs">
                                                 {statusLabel[todo.status] ?? todo.status}
                                             </span>
-                                            <span className="text-xs text-zinc-500">
+                                            <span className="text-xs text-slate-500 dark:text-slate-400">
                                                 우선순위 {todo.priority}
                                             </span>
                                         </div>
                                         {todo.description && (
-                                            <p className="mt-1 text-sm text-zinc-600">{todo.description}</p>
+                                            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{todo.description}</p>
                                         )}
-                                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-500">
+                                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
                                             {todo.dueDate && <span>마감 {formatDate(todo.dueDate)}</span>}
                                             {todo.estimatedMinutes && (
                                                 <span>예상 {todo.estimatedMinutes}분</span>
@@ -302,7 +302,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                                 <input type="hidden" name="id" value={todo.id} />
                                                 <input type="hidden" name="planId" value={plan.id} />
                                                 <input type="hidden" name="status" value="IN_PROGRESS" />
-                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-zinc-50">
+                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-slate-50 dark:bg-slate-900/50">
                                                     진행
                                                 </button>
                                             </form>
@@ -312,7 +312,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                                 <input type="hidden" name="id" value={todo.id} />
                                                 <input type="hidden" name="planId" value={plan.id} />
                                                 <input type="hidden" name="status" value="COMPLETED" />
-                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-zinc-50">
+                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-slate-50 dark:bg-slate-900/50">
                                                     완료
                                                 </button>
                                             </form>
@@ -322,7 +322,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                                 <input type="hidden" name="id" value={todo.id} />
                                                 <input type="hidden" name="planId" value={plan.id} />
                                                 <input type="hidden" name="status" value="PENDING" />
-                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-zinc-50">
+                                                <button type="submit" className="rounded-lg border px-2.5 py-1 text-xs hover:bg-slate-50 dark:bg-slate-900/50">
                                                     되돌리기
                                                 </button>
                                             </form>
@@ -341,7 +341,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                 </div>
 
                                 {/* 실행 기록 추가 */}
-                                <details className="mt-4 rounded-lg border bg-zinc-50 p-3">
+                                <details className="mt-4 rounded-lg border bg-slate-50 dark:bg-slate-900/50 p-3">
                                     <summary className="cursor-pointer text-sm font-medium">
                                         실행 기록 남기기 / 보기 ({todo.executionLogs.length})
                                     </summary>
@@ -406,7 +406,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                             {todo.executionLogs.map((log) => (
                                                 <li
                                                     key={log.id}
-                                                    className="rounded-lg border bg-white px-3 py-2 text-xs text-zinc-600"
+                                                    className="rounded-lg border bg-white px-3 py-2 text-xs text-slate-600 dark:text-slate-300"
                                                 >
                                                     <div>
                                                         {log.startedAt.toLocaleString("ko-KR")}
@@ -435,9 +435,9 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
             </section>
 
             {/* 계획 수정 폼 */}
-            <section className="rounded-xl border bg-white p-6 shadow-sm">
+            <section className="card p-6">
                 <h3 className="mb-4 font-semibold">계획 수정</h3>
-                <p className="mb-4 text-sm text-zinc-500">
+                <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
                     수정하면 현재 내용이 이력으로 자동 저장됩니다.
                 </p>
                 <form action={updatePlan} className="space-y-4">
@@ -535,7 +535,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
             <section className="space-y-4">
                 <h3 className="font-semibold">수정 이력</h3>
                 {plan.versions.length === 0 ? (
-                    <p className="rounded-xl border border-dashed py-8 text-center text-sm text-zinc-500">
+                    <p className="rounded-xl border border-dashed py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                         아직 수정 이력이 없습니다.
                     </p>
                 ) : (
@@ -544,12 +544,12 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                             <li key={version.id} className="rounded-xl border bg-white p-4 text-sm shadow-sm">
                                 <div className="flex items-center justify-between gap-2">
                                     <span className="font-medium">{version.title}</span>
-                                    <span className="text-xs text-zinc-500">
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
                                         {version.changedAt.toLocaleString("ko-KR")}
                                     </span>
                                 </div>
                                 {version.changeNote && (
-                                    <p className="mt-1 text-zinc-600">메모: {version.changeNote}</p>
+                                    <p className="mt-1 text-slate-600 dark:text-slate-300">메모: {version.changeNote}</p>
                                 )}
                             </li>
                         ))}

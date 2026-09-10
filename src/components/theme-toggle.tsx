@@ -13,7 +13,7 @@ export function ThemeToggle() {
         return (
             <button
                 type="button"
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-500"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900"
                 aria-label="테마 전환"
             >
                 ...
