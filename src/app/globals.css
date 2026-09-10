@@ -24,3 +24,39 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 40%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.06), transparent 35%),
+    #f8fafc;
+}
+
+.card {
+  @apply rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm backdrop-blur;
+}
+
+.card-hover {
+  @apply transition hover:-translate-y-0.5 hover:shadow-md;
+}
+
+.btn-primary {
+  @apply rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800;
+}
+
+.btn-secondary {
+  @apply rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50;
+}
+
+.input {
+  @apply w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-100;
+}
+
+.badge {
+  @apply rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600;
+}

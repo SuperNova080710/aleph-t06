@@ -13,9 +13,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "계획 다이어리",
+  title: "플랜두씨 다이어리",
   description: "Plan → Do → See 다이어리",
 };
+
+const nav = [
+  { href: "/", label: "홈" },
+  { href: "/plans", label: "계획" },
+  { href: "/review", label: "돌아보기" },
+];
 
 export default function RootLayout({
   children,
@@ -25,29 +31,40 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 text-zinc-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-900`}
       >
         <div className="min-h-screen">
-          <header className="border-b bg-white">
+          <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-              <h1 className="text-lg font-bold tracking-tight">
-                계획 다이어리
-              </h1>
-              <nav className="flex gap-4 text-sm text-zinc-600">
-                <a href="/" className="hover:text-zinc-900">
-                  홈
-                </a>
-                <a href="/plans" className="hover:text-zinc-900">
-                  계획
-                </a>
-                <a href="/review" className="hover:text-zinc-900">
-                  돌아보기
-                </a>
+              <a href="/" className="flex items-center gap-2">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+                  P
+                </span>
+                <div>
+                  <p className="text-sm font-bold tracking-tight">플랜두씨 다이어리</p>
+                  <p className="text-xs text-slate-500">Plan → Do → See</p>
+                </div>
+              </a>
+
+              <nav className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1">
+                {nav.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-full px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                  >
+                    {item.label}
+                  </a>
+                ))}
               </nav>
             </div>
           </header>
 
-          <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+          <main className="mx-auto max-w-5xl px-4 py-8 sm:py-10">{children}</main>
+
+          <footer className="border-t border-slate-200/70 py-8 text-center text-xs text-slate-500">
+            로그인 없이 동작하는 공개 다이어리 · 민감 정보는 넣지 마세요
+          </footer>
         </div>
       </body>
     </html>

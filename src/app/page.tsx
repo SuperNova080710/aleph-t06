@@ -1,69 +1,98 @@
 export default function HomePage() {
   return (
     <div className="space-y-8">
-      {/* T06 필수: 공개 안내 문구 */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-900">
-        <p className="font-medium">
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm">
+        <p className="font-semibold">
           지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다.
         </p>
-        <p className="mt-1 text-sm">
-          남이 봐도 괜찮은 내용만 넣으세요. (민감한 정보나 다른 사람 정보는 적지 마세요)
+        <p className="mt-1 text-sm text-amber-900/80">
+          남이 봐도 괜찮은 내용만 넣으세요. 민감한 정보나 다른 사람 정보는 적지 마세요.
         </p>
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Plan → Do → See
-        </h2>
-        <p className="text-zinc-600 leading-relaxed">
-          계획을 세우고, 실제로 한 일을 기록하고, 돌아보는 다이어리입니다.
-          <br />
-          내 실제 계획과 기록으로 채워보세요.
-        </p>
+      <section className="card overflow-hidden">
+        <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <p className="text-sm font-semibold text-indigo-600">T06 · Plan Do See</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              계획하고, 실행하고,
+              <br />
+              숫자로 돌아보기
+            </h2>
+            <p className="mt-4 max-w-xl text-slate-600 leading-relaxed">
+              내 실제 계획과 할 일, 실행 기록을 한곳에 모읍니다.
+              예상과 실제의 차이를 보고 다음 계획을 개선하세요.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="/plans" className="btn-primary">
+                계획 시작하기
+              </a>
+              <a href="/review" className="btn-secondary px-4 py-2.5 text-sm">
+                돌아보기
+              </a>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <div className="rounded-2xl bg-slate-900 p-4 text-white">
+              <p className="text-xs text-slate-300">Flow</p>
+              <p className="mt-2 text-lg font-semibold">Plan → Do → See</p>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="rounded-2xl bg-indigo-50 p-3">
+                <p className="text-xs text-indigo-600">Plan</p>
+                <p className="mt-1 text-sm font-semibold">계획</p>
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-3">
+                <p className="text-xs text-emerald-600">Do</p>
+                <p className="mt-1 text-sm font-semibold">실행</p>
+              </div>
+              <div className="rounded-2xl bg-amber-50 p-3">
+                <p className="text-xs text-amber-700">See</p>
+                <p className="mt-1 text-sm font-semibold">회고</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <a
-          href="/plans"
-          className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md"
-        >
-          <h3 className="font-semibold">계획 (Plan)</h3>
-          <p className="mt-2 text-sm text-zinc-500">
-            기간, 우선순위, 성공 기준을 담은 계획을 만듭니다.
-          </p>
-        </a>
-
-        <a
-          href="/plans"
-          className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md"
-        >
-          <h3 className="font-semibold">할 일 & 실행 (Do)</h3>
-          <p className="mt-2 text-sm text-zinc-500">
-            할 일을 관리하고, 실제로 한 일을 기록합니다.
-          </p>
-        </a>
-
-        <a
-          href="/review"
-          className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md"
-        >
-          <h3 className="font-semibold">돌아보기 (See)</h3>
-          <p className="mt-2 text-sm text-zinc-500">
-            예상과 실제를 비교하고 다음 계획을 개선합니다.
-          </p>
-        </a>
+        {[
+          {
+            href: "/plans",
+            title: "계획 (Plan)",
+            desc: "기간, 우선순위, 성공 기준을 담은 계획을 만듭니다.",
+          },
+          {
+            href: "/plans",
+            title: "할 일 & 실행 (Do)",
+            desc: "할 일을 관리하고 실제로 한 일을 기록합니다.",
+          },
+          {
+            href: "/review",
+            title: "돌아보기 (See)",
+            desc: "예상과 실제를 비교하고 다음 계획을 개선합니다.",
+          },
+        ].map((item) => (
+          <a key={item.title} href={item.href} className="card card-hover p-5">
+            <h3 className="font-semibold">{item.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">{item.desc}</p>
+          </a>
+        ))}
       </section>
-      <section className="rounded-xl border bg-white p-6 shadow-sm">
-        <h3 className="font-semibold">데이터 내보내기</h3>
-        <p className="mt-2 text-sm text-zinc-600">
-          내 계획, 할 일, 실행 기록, 수정 이력, 돌아보기 자료를 파일 하나로 내려받습니다.
-        </p>
-        <a
-          href="/api/export"
-          className="mt-4 inline-block rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-        >
-          JSON으로 내보내기
-        </a>
+
+      <section className="card p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-semibold">데이터 내보내기</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              계획, 할 일, 실행 기록, 수정 이력, 돌아보기 자료를 한 파일로 저장합니다.
+            </p>
+          </div>
+          <a href="/api/export" download className="btn-primary shrink-0 text-center">
+            JSON으로 내보내기
+          </a>
+        </div>
       </section>
     </div>
   );
