@@ -115,7 +115,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 </a>
                 <h2
                     className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100"
-                    style={{ viewTransitionName: `plan-title-${plan.id}` }}
+                    style={{ viewTransitionName: "plan-title" }}
                 >
                     {plan.title}
                 </h2>

@@ -47,3 +47,27 @@ html.dark body {
 .badge {
   @apply rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300;
 }
+
+/* View Transition 기본 애니메이션 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease;
+}
+
+::view-transition-old(plan-title),
+::view-transition-new(plan-title) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+::view-transition-old(review-panel),
+::view-transition-new(review-panel) {
+  animation-duration: 240ms;
+  animation-timing-function: ease;
+}
+
+/* 깜빡임 줄이기 */
+::view-transition-group(*) {
+  animation-duration: 240ms;
+}

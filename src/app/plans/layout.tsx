@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { TransitionLink } from "@/components/transition-link";
 
 export default async function PlansLayout({
     children,
@@ -37,21 +38,20 @@ export default async function PlansLayout({
                     <ul className="space-y-2">
                         {plans.map((plan) => (
                             <li key={plan.id}>
-                                <Link
+                                <TransitionLink
                                     href={`/plans/${plan.id}`}
                                     className="block rounded-xl border border-transparent px-3 py-3 transition hover:border-slate-200 hover:bg-slate-50 dark:hover:border-slate-700 dark:hover:bg-slate-800/60"
-                                    style={{ viewTransitionName: `plan-card-${plan.id}` }}
                                 >
                                     <p
                                         className="line-clamp-1 text-sm font-medium text-slate-900 dark:text-slate-100"
-                                        style={{ viewTransitionName: `plan-title-${plan.id}` }}
+                                        style={{ viewTransitionName: "plan-title" }}
                                     >
                                         {plan.title}
                                     </p>
                                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                         할 일 {plan._count.todos}개 · 우선순위 {plan.priority}
                                     </p>
-                                </Link>
+                                </TransitionLink>
                             </li>
                         ))}
                     </ul>

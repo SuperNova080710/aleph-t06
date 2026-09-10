@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createReview } from "./actions";
 import Link from "next/link";
+import { TransitionLink } from "@/components/transition-link";
 
 type Props = {
     searchParams: Promise<{
@@ -77,13 +78,12 @@ export default async function ReviewPage({ searchParams }: Props) {
                         const active = focus === item.key;
                         return (
                             <li key={item.key}>
-                                <Link
+                                <TransitionLink
                                     href={`/review?focus=${item.key}`}
                                     className={`block rounded-xl px-3 py-3 text-sm transition ${active
                                             ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
                                             : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
                                         }`}
-                                    style={{ viewTransitionName: `review-nav-${item.key}` }}
                                 >
                                     <div className="flex items-center justify-between gap-2">
                                         <span>{item.label}</span>
@@ -91,7 +91,7 @@ export default async function ReviewPage({ searchParams }: Props) {
                                             {item.count}
                                         </span>
                                     </div>
-                                </Link>
+                                </TransitionLink>
                             </li>
                         );
                     })}
@@ -117,7 +117,10 @@ export default async function ReviewPage({ searchParams }: Props) {
             </aside>
 
             {/* 가운데 콘텐츠 */}
-            <div className="space-y-8" style={{ viewTransitionName: `review-panel-${focus}` }}>
+            <div
+                className="space-y-8"
+                style={{ viewTransitionName: "review-panel" }}
+            >
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                         돌아보기 (See)
@@ -158,12 +161,12 @@ export default async function ReviewPage({ searchParams }: Props) {
                                                     예상 {todo.estimatedMinutes || 0}분 / 실제 {todoActual}분
                                                 </p>
                                             </div>
-                                            <Link
+                                            <TransitionLink
                                                 href={`/plans/${todo.planId}`}
                                                 className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                                             >
                                                 계획으로 이동 →
-                                            </Link>
+                                            </TransitionLink>
                                         </div>
                                     </li>
                                 );
