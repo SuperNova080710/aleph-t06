@@ -1,27 +1,21 @@
-import { prisma } from "@/lib/prisma";
 import { createPlan } from "./actions";
 
-export default async function PlansPage() {
-    const plans = await prisma.plan.findMany({
-        orderBy: { createdAt: "desc" },
-        include: {
-            _count: {
-                select: { todos: true },
-            },
-        },
-    });
-
+export default function PlansPage() {
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold tracking-tight">계획 (Plan)</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                    계획 워크스페이스
+                </h2>
                 <p className="mt-1 text-slate-600 dark:text-slate-300">
-                    실제로 하고 있는 일을 계획으로 만들어 보세요.
+                    왼쪽에서 계획을 선택하거나, 아래에서 새 계획을 만드세요.
                 </p>
             </div>
 
             <section className="card p-6">
-                <h3 className="mb-4 font-semibold">새 계획 만들기</h3>
+                <h3 className="mb-4 font-semibold text-slate-900 dark:text-slate-100">
+                    새 계획 만들기
+                </h3>
                 <form action={createPlan} className="space-y-4">
                     <div>
                         <label className="mb-1 block text-sm font-medium">제목 *</label>
@@ -62,7 +56,13 @@ export default async function PlansPage() {
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">예상 시간 (분)</label>
-                            <input type="number" name="estimatedMinutes" min="0" placeholder="예: 120" className="input" />
+                            <input
+                                type="number"
+                                name="estimatedMinutes"
+                                min="0"
+                                placeholder="예: 120"
+                                className="input"
+                            />
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">성공 기준</label>
@@ -74,49 +74,6 @@ export default async function PlansPage() {
                         계획 만들기
                     </button>
                 </form>
-            </section>
-
-            <section className="space-y-4">
-                <h3 className="font-semibold">내 계획 목록</h3>
-
-                {plans.length === 0 ? (
-                    <p className="rounded-2xl border border-dashed border-slate-300 py-12 text-center text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                        아직 계획이 없습니다. 위에서 첫 계획을 만들어 보세요.
-                    </p>
-                ) : (
-                    <ul className="space-y-3">
-                        {plans.map((plan) => (
-                            <li key={plan.id} className="card card-hover p-5">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h4 className="font-semibold">{plan.title}</h4>
-                                        {plan.description && (
-                                            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                                                {plan.description}
-                                            </p>
-                                        )}
-                                        <div className="mt-3 flex flex-wrap gap-2">
-                                            <span className="badge">우선순위 {plan.priority}</span>
-                                            {plan.estimatedMinutes && (
-                                                <span className="badge">예상 {plan.estimatedMinutes}분</span>
-                                            )}
-                                            <span className="badge">할 일 {plan._count.todos}개</span>
-                                            {plan.successCriteria && (
-                                                <span className="badge">성공 기준: {plan.successCriteria}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <a
-                                        href={`/plans/${plan.id}`}
-                                        className="shrink-0 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-                                    >
-                                        자세히 →
-                                    </a>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
             </section>
         </div>
     );

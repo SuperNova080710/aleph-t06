@@ -102,7 +102,10 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
     const nowLocal = formatDateTimeLocal(new Date());
 
     return (
-        <div className="space-y-10">
+        <div
+            className="space-y-10"
+            style={{ viewTransitionName: `plan-card-${plan.id}` }}
+        >
             <div>
                 <a
                     href="/plans"
@@ -110,7 +113,10 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 >
                     ← 계획 목록
                 </a>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                <h2
+                    className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100"
+                    style={{ viewTransitionName: `plan-title-${plan.id}` }}
+                >
                     {plan.title}
                 </h2>
                 {plan.description && (
