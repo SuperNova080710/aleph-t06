@@ -533,24 +533,49 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
 
             {/* 수정 이력 */}
             <section className="space-y-4">
-                <h3 className="font-semibold">수정 이력</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">수정 이력</h3>
+
                 {plan.versions.length === 0 ? (
-                    <p className="rounded-xl border border-dashed py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <p className="rounded-2xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
                         아직 수정 이력이 없습니다.
                     </p>
                 ) : (
                     <ul className="space-y-3">
                         {plan.versions.map((version) => (
-                            <li key={version.id} className="rounded-xl border bg-white p-4 text-sm shadow-sm">
+                            <li
+                                key={version.id}
+                                className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900/90"
+                            >
                                 <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium">{version.title}</span>
+                                    <span className="font-medium text-slate-900 dark:text-slate-100">
+                                        {version.title}
+                                    </span>
                                     <span className="text-xs text-slate-500 dark:text-slate-400">
                                         {version.changedAt.toLocaleString("ko-KR")}
                                     </span>
                                 </div>
+
                                 {version.changeNote && (
-                                    <p className="mt-1 text-slate-600 dark:text-slate-300">메모: {version.changeNote}</p>
+                                    <p className="mt-1 text-slate-600 dark:text-slate-300">
+                                        메모: {version.changeNote}
+                                    </p>
                                 )}
+
+                                <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-800 dark:text-slate-300">
+                                        우선순위 {version.priority}
+                                    </span>
+                                    {version.estimatedMinutes && (
+                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-800 dark:text-slate-300">
+                                            예상 {version.estimatedMinutes}분
+                                        </span>
+                                    )}
+                                    {version.successCriteria && (
+                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-800 dark:text-slate-300">
+                                            성공 기준: {version.successCriteria}
+                                        </span>
+                                    )}
+                                </div>
                             </li>
                         ))}
                     </ul>
