@@ -1,0 +1,122 @@
+{
+    "name": "plan-do-see-schema",
+    "version": "v2",
+    "description": "T06 Plan-Do-See diary database contract",
+    "timezone": {
+        "storage": "Database timestamps use PostgreSQL timestamp types via Prisma DateTime",
+        "dateOnlyFields": [
+            "startDate",
+            "endDate",
+            "dueDate",
+            "periodStart",
+            "periodEnd"
+        ],
+        "delayRule": "A todo is delayed when status is not COMPLETED and dueDate is before the current calendar date in Asia/Seoul"
+    },
+    "entities": {
+        "plans": {
+            "table": "plans",
+            "primaryKey": "id",
+            "fields": {
+                "id": "string cuid",
+                "title": "string required",
+                "description": "string nullable",
+                "startDate": "date nullable",
+                "endDate": "date nullable",
+                "priority": "int 1-5",
+                "successCriteria": "string nullable",
+                "estimatedMinutes": "int nullable",
+                "createdAt": "datetime",
+                "updatedAt": "datetime"
+            },
+            "relations": {
+                "versions": "plan_versions[]",
+                "todos": "todos[]",
+                "reviews": "reviews[]"
+            }
+        },
+        "plan_versions": {
+            "table": "plan_versions",
+            "primaryKey": "id",
+            "purpose": "Preserve plan content before each update",
+            "fields": {
+                "id": "string cuid",
+                "planId": "string fk plans.id",
+                "title": "string",
+                "description": "string nullable",
+                "startDate": "date nullable",
+                "endDate": "date nullable",
+                "priority": "int",
+                "successCriteria": "string nullable",
+                "estimatedMinutes": "int nullable",
+                "changedAt": "datetime",
+                "changeNote": "string nullable"
+            }
+        },
+        "todos": {
+            "table": "todos",
+            "primaryKey": "id",
+            "fields": {
+                "id": "string cuid",
+                "planId": "string fk plans.id",
+                "title": "string required",
+                "description": "string nullable",
+                "status": "enum PENDING | IN_PROGRESS | COMPLETED | CANCELLED",
+                "priority": "int 1-5",
+                "dueDate": "date nullable",
+                "tags": "string[]",
+                "estimatedMinutes": "int nullable",
+                "completedAt": "datetime nullable",
+                "createdAt": "datetime",
+                "updatedAt": "datetime"
+            },
+            "relations": {
+                "executionLogs": "execution_logs[]"
+            }
+        },
+        "execution_logs": {
+            "table": "execution_logs",
+            "primaryKey": "id",
+            "purpose": "Actual work records separate from plan/todo estimates",
+            "fields": {
+                "id": "string cuid",
+                "todoId": "string fk todos.id",
+                "startedAt": "datetime required",
+                "endedAt": "datetime nullable",
+                "actualMinutes": "int nullable",
+                "blockedReason": "string nullable",
+                "note": "string nullable",
+                "createdAt": "datetime"
+            },
+            "rules": [
+                "Creating an execution log must not overwrite todo.estimatedMinutes or plan fields"
+            ]
+        },
+        "reviews": {
+            "table": "reviews",
+            "primaryKey": "id",
+            "purpose": "Store one improvement line to carry into the next plan",
+            "fields": {
+                "id": "string cuid",
+                "planId": "string nullable fk plans.id",
+                "periodStart": "date nullable",
+                "periodEnd": "date nullable",
+                "improvement": "string required",
+                "createdAt": "datetime"
+            }
+        }
+    },
+    "aggregationRules": {
+        "planCount": "Count of todos that are not deleted",
+        "completedCount": "Count of todos with status COMPLETED",
+        "delayedCount": "Count of todos where status != COMPLETED and dueDate < Asia/Seoul today",
+        "blockedCount": "Count of todos that have at least one execution_log.blockedReason",
+        "estimatedMinutesSum": "Sum of todo.estimatedMinutes (null as 0)",
+        "actualMinutesSum": "Sum of execution_log.actualMinutes (null as 0)",
+        "difference": "actualMinutesSum - estimatedMinutesSum"
+    },
+    "security": {
+        "auth": "No signup/login/auth in T06",
+        "publicAccess": "Anyone with the link can view data. Only non-sensitive personal content should be stored."
+    }
+}

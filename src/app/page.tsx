@@ -53,6 +53,18 @@ export default function HomePage() {
           </p>
         </a>
       </section>
+      <section className="rounded-xl border bg-white p-6 shadow-sm">
+        <h3 className="font-semibold">데이터 내보내기</h3>
+        <p className="mt-2 text-sm text-zinc-600">
+          내 계획, 할 일, 실행 기록, 수정 이력, 돌아보기 자료를 파일 하나로 내려받습니다.
+        </p>
+        <a
+          href="/api/export"
+          className="mt-4 inline-block rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+        >
+          JSON으로 내보내기
+        </a>
+      </section>
     </div>
   );
 }
