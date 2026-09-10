@@ -165,3 +165,37 @@ export async function deleteTodo(formData: FormData) {
     await prisma.todo.delete({ where: { id } });
     revalidatePath(`/plans/${planId}`);
 }
+
+export async function createExecutionLog(formData: FormData) {
+    const todoId = formData.get("todoId") as string;
+    const planId = formData.get("planId") as string;
+    const startedAtRaw = formData.get("startedAt") as string;
+    const endedAtRaw = formData.get("endedAt") as string | null;
+    const actualMinutes = formData.get("actualMinutes")
+        ? Number(formData.get("actualMinutes"))
+        : null;
+    const blockedReason =
+        (formData.get("blockedReason") as string)?.trim() || null;
+    const note = (formData.get("note") as string)?.trim() || null;
+
+    if (!todoId || !planId || !startedAtRaw) {
+        throw new Error("필수 값이 없습니다.");
+    }
+
+    const startedAt = new Date(startedAtRaw);
+    const endedAt = endedAtRaw ? new Date(endedAtRaw) : null;
+
+    // 실행 기록만 추가 (Todo/Plan 값은 절대 덮어쓰지 않음)
+    await prisma.executionLog.create({
+        data: {
+            todoId,
+            startedAt,
+            endedAt,
+            actualMinutes,
+            blockedReason,
+            note,
+        },
+    });
+
+    revalidatePath(`/plans/${planId}`);
+}
