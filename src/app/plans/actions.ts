@@ -199,3 +199,13 @@ export async function createExecutionLog(formData: FormData) {
 
     revalidatePath(`/plans/${planId}`);
 }
+
+export async function getExecutionLogs(todoId: string) {
+  if (!todoId) return [];
+
+  return prisma.executionLog.findMany({
+    where: { todoId },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+}

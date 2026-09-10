@@ -94,7 +94,7 @@ export default function HomePage() {
             </p>
           </div>
           <a href="/api/export" download className="btn-primary shrink-0 text-center">
-            JSON으로 내보내기
+            JSON으로 데이터 다운받기
           </a>
         </div>
       </section>
