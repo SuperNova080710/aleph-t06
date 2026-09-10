@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createReview } from "./actions";
+import { ReviewShell } from "@/components/review-shell";
 import Link from "next/link";
-import { TransitionLink } from "@/components/transition-link";
 
 type Props = {
     searchParams: Promise<{
@@ -67,174 +67,124 @@ export default async function ReviewPage({ searchParams }: Props) {
     ];
 
     return (
-        <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-            {/* 왼쪽 네비 */}
-            <aside className="card h-fit p-4 lg:sticky lg:top-24">
-                <h2 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    돌아보기 메뉴
+        <ReviewShell
+            focus={focus}
+            navItems={navItems}
+            estimatedSum={estimatedSum}
+            actualSum={actualSum}
+            diff={diff}
+        >
+            <div>
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                    돌아보기 (See)
                 </h2>
-                <ul className="space-y-2">
-                    {navItems.map((item) => {
-                        const active = focus === item.key;
-                        return (
-                            <li key={item.key}>
-                                <TransitionLink
-                                    href={`/review?focus=${item.key}`}
-                                    className={`block rounded-xl px-3 py-3 text-sm transition ${active
-                                            ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                                            : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between gap-2">
-                                        <span>{item.label}</span>
-                                        <span className={active ? "opacity-80" : "text-slate-500 dark:text-slate-400"}>
-                                            {item.count}
-                                        </span>
-                                    </div>
-                                </TransitionLink>
-                            </li>
-                        );
-                    })}
-                </ul>
-
-                <div className="mt-6 space-y-2 border-t border-slate-200 pt-4 text-sm dark:border-slate-700">
-                    <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">예상</span>
-                        <span>{estimatedSum}분</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">실제</span>
-                        <span>{actualSum}분</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">차이</span>
-                        <span>
-                            {diff >= 0 ? "+" : ""}
-                            {diff}분
-                        </span>
-                    </div>
-                </div>
-            </aside>
-
-            {/* 가운데 콘텐츠 */}
-            <div
-                className="space-y-8"
-                style={{ viewTransitionName: "review-panel" }}
-            >
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                        돌아보기 (See)
-                    </h2>
-                    <p className="mt-1 text-slate-600 dark:text-slate-300">
-                        왼쪽 메뉴에서 집계를 선택하면 가운데에 근거 기록이 표시됩니다.
-                    </p>
-                </div>
-
-                <section className="space-y-4">
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                        근거 기록 · {navItems.find((n) => n.key === focus)?.label}
-                    </h3>
-
-                    {focusedTodos.length === 0 ? (
-                        <p className="rounded-2xl border border-dashed border-slate-300 py-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                            해당하는 기록이 없습니다.
-                        </p>
-                    ) : (
-                        <ul className="space-y-3">
-                            {focusedTodos.map((todo) => {
-                                const parentPlan = plans.find((p) => p.id === todo.planId);
-                                const todoActual = todo.executionLogs.reduce(
-                                    (s, log) => s + (log.actualMinutes || 0),
-                                    0
-                                );
-                                return (
-                                    <li key={todo.id} className="card p-4">
-                                        <div className="flex flex-wrap items-start justify-between gap-2">
-                                            <div>
-                                                <p className="font-medium text-slate-900 dark:text-slate-100">
-                                                    {todo.title}
-                                                </p>
-                                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                                    계획: {parentPlan?.title || "-"} · 상태: {todo.status}
-                                                </p>
-                                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                                    예상 {todo.estimatedMinutes || 0}분 / 실제 {todoActual}분
-                                                </p>
-                                            </div>
-                                            <TransitionLink
-                                                href={`/plans/${todo.planId}`}
-                                                className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-                                            >
-                                                계획으로 이동 →
-                                            </TransitionLink>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    )}
-                </section>
-
-                <section className="card p-6">
-                    <h3 className="mb-2 font-semibold">다음 계획으로 넘길 고칠 점</h3>
-                    <form action={createReview} className="space-y-4">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium">관련 계획 (선택)</label>
-                            <select name="planId" defaultValue="" className="input">
-                                <option value="">전체 / 특정 계획 없음</option>
-                                {plans.map((plan) => (
-                                    <option key={plan.id} value={plan.id}>
-                                        {plan.title}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label className="mb-1 block text-sm font-medium">기간 시작</label>
-                                <input type="date" name="periodStart" className="input" />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-sm font-medium">기간 종료</label>
-                                <input type="date" name="periodEnd" className="input" />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-medium">고칠 점 *</label>
-                            <input
-                                name="improvement"
-                                required
-                                placeholder="예: 예상 시간을 실제 기록 기준으로 다시 잡기"
-                                className="input"
-                            />
-                        </div>
-                        <button type="submit" className="btn-primary">
-                            고칠 점 저장
-                        </button>
-                    </form>
-                </section>
-
-                <section className="space-y-4">
-                    <h3 className="font-semibold">저장된 고칠 점</h3>
-                    {reviews.length === 0 ? (
-                        <p className="rounded-2xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                            아직 저장된 고칠 점이 없습니다.
-                        </p>
-                    ) : (
-                        <ul className="space-y-3">
-                            {reviews.map((review) => (
-                                <li key={review.id} className="card p-4 text-sm">
-                                    <p className="font-medium">{review.improvement}</p>
-                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                        {review.plan ? `관련 계획: ${review.plan.title} · ` : ""}
-                                        {review.createdAt.toLocaleString("ko-KR")}
-                                    </p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
+                <p className="mt-1 text-slate-600 dark:text-slate-300">
+                    왼쪽 메뉴에서 집계를 선택하면 가운데에 근거 기록이 표시됩니다.
+                </p>
             </div>
-        </div>
+
+            <section className="space-y-4">
+                <h3 className="font-semibold">
+                    근거 기록 · {navItems.find((n) => n.key === focus)?.label}
+                </h3>
+
+                {focusedTodos.length === 0 ? (
+                    <p className="rounded-2xl border border-dashed border-slate-300 py-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                        해당하는 기록이 없습니다.
+                    </p>
+                ) : (
+                    <ul className="space-y-3">
+                        {focusedTodos.map((todo) => {
+                            const parentPlan = plans.find((p) => p.id === todo.planId);
+                            const todoActual = todo.executionLogs.reduce(
+                                (s, log) => s + (log.actualMinutes || 0),
+                                0
+                            );
+                            return (
+                                <li key={todo.id} className="card p-4">
+                                    <div className="flex flex-wrap items-start justify-between gap-2">
+                                        <div>
+                                            <p className="font-medium">{todo.title}</p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                                계획: {parentPlan?.title || "-"} · 상태: {todo.status}
+                                            </p>
+                                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                                예상 {todo.estimatedMinutes || 0}분 / 실제 {todoActual}분
+                                            </p>
+                                        </div>
+                                        <Link
+                                            href={`/plans/${todo.planId}`}
+                                            className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                                        >
+                                            계획으로 이동 →
+                                        </Link>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+            </section>
+
+            <section className="card p-6">
+                <h3 className="mb-2 font-semibold">다음 계획으로 넘길 고칠 점</h3>
+                <form action={createReview} className="space-y-4">
+                    <div>
+                        <label className="mb-1 block text-sm font-medium">관련 계획 (선택)</label>
+                        <select name="planId" defaultValue="" className="input">
+                            <option value="">전체 / 특정 계획 없음</option>
+                            {plans.map((plan) => (
+                                <option key={plan.id} value={plan.id}>
+                                    {plan.title}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-sm font-medium">기간 시작</label>
+                            <input type="date" name="periodStart" className="input" />
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-sm font-medium">기간 종료</label>
+                            <input type="date" name="periodEnd" className="input" />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-sm font-medium">고칠 점 *</label>
+                        <input
+                            name="improvement"
+                            required
+                            placeholder="예: 예상 시간을 실제 기록 기준으로 다시 잡기"
+                            className="input"
+                        />
+                    </div>
+                    <button type="submit" className="btn-primary">
+                        고칠 점 저장
+                    </button>
+                </form>
+            </section>
+
+            <section className="space-y-4">
+                <h3 className="font-semibold">저장된 고칠 점</h3>
+                {reviews.length === 0 ? (
+                    <p className="rounded-2xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                        아직 저장된 고칠 점이 없습니다.
+                    </p>
+                ) : (
+                    <ul className="space-y-3">
+                        {reviews.map((review) => (
+                            <li key={review.id} className="card p-4 text-sm">
+                                <p className="font-medium">{review.improvement}</p>
+                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                    {review.plan ? `관련 계획: ${review.plan.title} · ` : ""}
+                                    {review.createdAt.toLocaleString("ko-KR")}
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
+        </ReviewShell>
     );
 }

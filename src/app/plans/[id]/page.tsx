@@ -7,6 +7,7 @@ import {
     deleteTodo,
     createExecutionLog,
 } from "../actions";
+import { PlanDetailShell } from "@/components/plan-detail-shell";
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -28,19 +29,13 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
     const plan = await prisma.plan.findUnique({
         where: { id },
         include: {
-            versions: {
-                orderBy: { changedAt: "desc" },
-            },
+            versions: { orderBy: { changedAt: "desc" } },
             todos: {
                 include: {
-                    executionLogs: {
-                        orderBy: { createdAt: "desc" },
-                    },
+                    executionLogs: { orderBy: { createdAt: "desc" } },
                 },
             },
-            _count: {
-                select: { todos: true },
-            },
+            _count: { select: { todos: true } },
         },
     });
 
@@ -102,10 +97,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
     const nowLocal = formatDateTimeLocal(new Date());
 
     return (
-        <div
-            className="space-y-10"
-            style={{ viewTransitionName: `plan-card-${plan.id}` }}
-        >
+        <PlanDetailShell planId={plan.id} title={plan.title}>
             <div>
                 <a
                     href="/plans"
@@ -113,56 +105,44 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 >
                     ← 계획 목록
                 </a>
-                <h2
-                    className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100"
-                    style={{ viewTransitionName: "plan-title" }}
-                >
-                    {plan.title}
-                </h2>
                 {plan.description && (
-                    <p className="mt-1 text-slate-600 dark:text-slate-300">{plan.description}</p>
+                    <p className="mt-2 text-slate-600 dark:text-slate-300">{plan.description}</p>
                 )}
             </div>
 
-            {/* 현재 계획 정보 */}
             <section className="card p-6">
                 <h3 className="mb-4 font-semibold text-slate-900 dark:text-slate-100">현재 계획</h3>
                 <dl className="grid gap-3 text-sm sm:grid-cols-2">
                     <div>
                         <dt className="text-slate-500 dark:text-slate-400">우선순위</dt>
-                        <dd className="font-medium text-slate-900 dark:text-slate-100">{plan.priority}</dd>
+                        <dd className="font-medium">{plan.priority}</dd>
                     </div>
                     <div>
                         <dt className="text-slate-500 dark:text-slate-400">예상 시간</dt>
-                        <dd className="font-medium text-slate-900 dark:text-slate-100">
+                        <dd className="font-medium">
                             {plan.estimatedMinutes ? `${plan.estimatedMinutes}분` : "-"}
                         </dd>
                     </div>
                     <div>
                         <dt className="text-slate-500 dark:text-slate-400">기간</dt>
-                        <dd className="font-medium text-slate-900 dark:text-slate-100">
+                        <dd className="font-medium">
                             {formatDate(plan.startDate) || "-"} ~ {formatDate(plan.endDate) || "-"}
                         </dd>
                     </div>
                     <div>
                         <dt className="text-slate-500 dark:text-slate-400">할 일 수</dt>
-                        <dd className="font-medium text-slate-900 dark:text-slate-100">
-                            {plan._count.todos}개
-                        </dd>
+                        <dd className="font-medium">{plan._count.todos}개</dd>
                     </div>
                     <div className="sm:col-span-2">
                         <dt className="text-slate-500 dark:text-slate-400">성공 기준</dt>
-                        <dd className="font-medium text-slate-900 dark:text-slate-100">
-                            {plan.successCriteria || "-"}
-                        </dd>
+                        <dd className="font-medium">{plan.successCriteria || "-"}</dd>
                     </div>
                 </dl>
             </section>
 
-            {/* 할 일 섹션 */}
             <section className="space-y-4">
                 <div className="flex flex-wrap items-end justify-between gap-3">
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">할 일 (Todo)</h3>
+                    <h3 className="font-semibold">할 일 (Todo)</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                         정렬 기준:{" "}
                         {sort === "dueDate"
@@ -173,14 +153,8 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                     </p>
                 </div>
 
-                {/* 검색 / 필터 / 정렬 */}
                 <form className="card grid gap-3 p-4 sm:grid-cols-4">
-                    <input
-                        name="q"
-                        defaultValue={q}
-                        placeholder="제목, 설명, 태그 검색"
-                        className="input sm:col-span-2"
-                    />
+                    <input name="q" defaultValue={q} placeholder="제목, 설명, 태그 검색" className="input sm:col-span-2" />
                     <select name="status" defaultValue={statusFilter} className="input">
                         <option value="ALL">전체 상태</option>
                         <option value="PENDING">대기</option>
@@ -198,21 +172,13 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                     </button>
                 </form>
 
-                {/* 할 일 추가 */}
                 <div className="card p-6">
-                    <h4 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        할 일 추가
-                    </h4>
+                    <h4 className="mb-4 text-sm font-semibold">할 일 추가</h4>
                     <form action={createTodo} className="space-y-3">
                         <input type="hidden" name="planId" value={plan.id} />
                         <div>
                             <label className="mb-1 block text-sm font-medium">제목 *</label>
-                            <input
-                                name="title"
-                                required
-                                placeholder="예: Prisma 스키마 작성"
-                                className="input"
-                            />
+                            <input name="title" required placeholder="예: Prisma 스키마 작성" className="input" />
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">설명</label>
@@ -235,13 +201,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-medium">예상 시간(분)</label>
-                                <input
-                                    type="number"
-                                    name="estimatedMinutes"
-                                    min="0"
-                                    placeholder="30"
-                                    className="input"
-                                />
+                                <input type="number" name="estimatedMinutes" min="0" placeholder="30" className="input" />
                             </div>
                             <div>
                                 <label className="mb-1 block text-sm font-medium">태그 (쉼표 구분)</label>
@@ -254,7 +214,6 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                     </form>
                 </div>
 
-                {/* 할 일 목록 */}
                 {todos.length === 0 ? (
                     <p className="rounded-2xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
                         조건에 맞는 할 일이 없습니다.
@@ -266,9 +225,7 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <span className="font-medium text-slate-900 dark:text-slate-100">
-                                                {todo.title}
-                                            </span>
+                                            <span className="font-medium">{todo.title}</span>
                                             <span className={statusClass[todo.status] ?? statusClass.PENDING}>
                                                 {statusLabel[todo.status] ?? todo.status}
                                             </span>
@@ -276,13 +233,11 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                                 우선순위 {todo.priority}
                                             </span>
                                         </div>
-
                                         {todo.description && (
                                             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                                                 {todo.description}
                                             </p>
                                         )}
-
                                         <div className="mt-2 flex flex-wrap gap-2 text-xs">
                                             {todo.dueDate && (
                                                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -349,9 +304,8 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                     </div>
                                 </div>
 
-                                {/* 실행 기록 */}
                                 <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900/50">
-                                    <summary className="cursor-pointer text-sm font-medium text-slate-800 dark:text-slate-200">
+                                    <summary className="cursor-pointer text-sm font-medium">
                                         실행 기록 남기기 / 보기 ({todo.executionLogs.length})
                                     </summary>
 
@@ -374,21 +328,11 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-xs font-medium">실제 소요(분)</label>
-                                            <input
-                                                type="number"
-                                                name="actualMinutes"
-                                                min="0"
-                                                placeholder="45"
-                                                className="input"
-                                            />
+                                            <input type="number" name="actualMinutes" min="0" placeholder="45" className="input" />
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-xs font-medium">막힌 이유</label>
-                                            <input
-                                                name="blockedReason"
-                                                placeholder="예: 환경변수 설정 오류"
-                                                className="input"
-                                            />
+                                            <input name="blockedReason" placeholder="예: 환경변수 설정 오류" className="input" />
                                         </div>
                                         <div className="sm:col-span-2">
                                             <label className="mb-1 block text-xs font-medium">메모</label>
@@ -430,52 +374,31 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 )}
             </section>
 
-            {/* 계획 수정 */}
             <section className="card p-6">
-                <h3 className="mb-4 font-semibold text-slate-900 dark:text-slate-100">계획 수정</h3>
+                <h3 className="mb-4 font-semibold">계획 수정</h3>
                 <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
                     수정하면 현재 내용이 이력으로 자동 저장됩니다.
                 </p>
-
                 <form action={updatePlan} className="space-y-4">
                     <input type="hidden" name="id" value={plan.id} />
-
                     <div>
                         <label className="mb-1 block text-sm font-medium">제목 *</label>
                         <input name="title" required defaultValue={plan.title} className="input" />
                     </div>
-
                     <div>
                         <label className="mb-1 block text-sm font-medium">설명</label>
-                        <textarea
-                            name="description"
-                            rows={2}
-                            defaultValue={plan.description ?? ""}
-                            className="input"
-                        />
+                        <textarea name="description" rows={2} defaultValue={plan.description ?? ""} className="input" />
                     </div>
-
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
                             <label className="mb-1 block text-sm font-medium">시작일</label>
-                            <input
-                                type="date"
-                                name="startDate"
-                                defaultValue={formatDate(plan.startDate)}
-                                className="input"
-                            />
+                            <input type="date" name="startDate" defaultValue={formatDate(plan.startDate)} className="input" />
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">종료일</label>
-                            <input
-                                type="date"
-                                name="endDate"
-                                defaultValue={formatDate(plan.endDate)}
-                                className="input"
-                            />
+                            <input type="date" name="endDate" defaultValue={formatDate(plan.endDate)} className="input" />
                         </div>
                     </div>
-
                     <div className="grid gap-4 sm:grid-cols-3">
                         <div>
                             <label className="mb-1 block text-sm font-medium">우선순위</label>
@@ -499,29 +422,21 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">성공 기준</label>
-                            <input
-                                name="successCriteria"
-                                defaultValue={plan.successCriteria ?? ""}
-                                className="input"
-                            />
+                            <input name="successCriteria" defaultValue={plan.successCriteria ?? ""} className="input" />
                         </div>
                     </div>
-
                     <div>
                         <label className="mb-1 block text-sm font-medium">수정 메모 (선택)</label>
                         <input name="changeNote" placeholder="예: 마감일을 이틀 늦춤" className="input" />
                     </div>
-
                     <button type="submit" className="btn-primary">
                         수정 저장 (이력 남기기)
                     </button>
                 </form>
             </section>
 
-            {/* 수정 이력 */}
             <section className="space-y-4">
-                <h3 className="font-semibold text-slate-900 dark:text-slate-100">수정 이력</h3>
-
+                <h3 className="font-semibold">수정 이력</h3>
                 {plan.versions.length === 0 ? (
                     <p className="rounded-2xl border border-dashed border-slate-300 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
                         아직 수정 이력이 없습니다.
@@ -534,40 +449,19 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                                 className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm dark:border-slate-800 dark:bg-slate-900/90"
                             >
                                 <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium text-slate-900 dark:text-slate-100">
-                                        {version.title}
-                                    </span>
+                                    <span className="font-medium">{version.title}</span>
                                     <span className="text-xs text-slate-500 dark:text-slate-400">
                                         {version.changedAt.toLocaleString("ko-KR")}
                                     </span>
                                 </div>
-
                                 {version.changeNote && (
-                                    <p className="mt-1 text-slate-600 dark:text-slate-300">
-                                        메모: {version.changeNote}
-                                    </p>
+                                    <p className="mt-1 text-slate-600 dark:text-slate-300">메모: {version.changeNote}</p>
                                 )}
-
-                                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                        우선순위 {version.priority}
-                                    </span>
-                                    {version.estimatedMinutes && (
-                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                            예상 {version.estimatedMinutes}분
-                                        </span>
-                                    )}
-                                    {version.successCriteria && (
-                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                            성공 기준: {version.successCriteria}
-                                        </span>
-                                    )}
-                                </div>
                             </li>
                         ))}
                     </ul>
                 )}
             </section>
-        </div>
+        </PlanDetailShell>
     );
 }
