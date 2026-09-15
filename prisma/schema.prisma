@@ -19,21 +19,21 @@ datasource db {
 // Plan (계획)
 // -----------------------------
 model Plan {
-  id              String        @id @default(cuid())
-  title           String
-  description     String?
-  startDate       DateTime?     @db.Date
-  endDate         DateTime?     @db.Date
-  priority        Int           @default(3) // 1(높음) ~ 5(낮음)
-  successCriteria String?       // 성공 기준
-  estimatedMinutes Int?         // 예상 시간 (분 단위)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  title            String
+  description      String?
+  startDate        DateTime?     @db.Date
+  endDate          DateTime?     @db.Date
+  priority         Int           @default(3)
+  successCriteria  String?
+  estimatedMinutes Int?
+  deletedAt        DateTime?     // 삭제 시각 (null이면 활성)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
-  // Relations
-  versions        PlanVersion[]
-  todos           Todo[]
-  reviews         Review[]
+  versions         PlanVersion[]
+  todos            Todo[]
+  reviews          Review[]
 
   @@map("plans")
 }

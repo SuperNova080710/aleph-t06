@@ -6,6 +6,8 @@ import {
     updateTodoStatus,
     deleteTodo,
     createExecutionLog,
+    deletePlan,
+    restorePlan,
 } from "../actions";
 import { PlanDetailShell } from "@/components/plan-detail-shell";
 
@@ -105,9 +107,37 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
                 >
                     ← 계획 목록
                 </a>
+
                 {plan.description && (
                     <p className="mt-2 text-slate-600 dark:text-slate-300">{plan.description}</p>
                 )}
+
+                {plan.deletedAt && (
+                    <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100">
+                        이 계획은 삭제된 상태입니다. 복원하면 다시 목록에 표시됩니다.
+                    </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {plan.deletedAt ? (
+                        <form action={restorePlan}>
+                            <input type="hidden" name="id" value={plan.id} />
+                            <button type="submit" className="btn-primary">
+                                계획 복원
+                            </button>
+                        </form>
+                    ) : (
+                        <form action={deletePlan}>
+                            <input type="hidden" name="id" value={plan.id} />
+                            <button
+                                type="submit"
+                                className="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:bg-slate-900 dark:text-red-300 dark:hover:bg-red-950/40"
+                            >
+                                계획 삭제
+                            </button>
+                        </form>
+                    )}
+                </div>
             </div>
 
             <section className="card p-6">

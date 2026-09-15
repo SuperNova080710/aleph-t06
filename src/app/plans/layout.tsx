@@ -9,6 +9,7 @@ const getPlansForSidebar = cache(async () => {
       id: true,
       title: true,
       priority: true,
+      deletedAt: true,
       _count: { select: { todos: true } },
     },
   });
@@ -29,6 +30,7 @@ export default async function PlansLayout({
           title: plan.title,
           priority: plan.priority,
           todoCount: plan._count.todos,
+          deleted: !!plan.deletedAt,
         }))}
       />
       <section className="min-w-0">{children}</section>

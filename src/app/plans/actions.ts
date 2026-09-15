@@ -209,3 +209,31 @@ export async function getExecutionLogs(todoId: string) {
     take: 20,
   });
 }
+
+export async function deletePlan(formData: FormData) {
+    const id = formData.get("id") as string;
+    if (!id) throw new Error("계획 ID가 없습니다.");
+
+    await prisma.plan.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+    });
+
+    revalidatePath("/plans");
+    revalidatePath(`/plans/${id}`);
+    redirect("/plans?trash=1");
+}
+
+export async function restorePlan(formData: FormData) {
+    const id = formData.get("id") as string;
+    if (!id) throw new Error("계획 ID가 없습니다.");
+
+    await prisma.plan.update({
+        where: { id },
+        data: { deletedAt: null },
+    });
+
+    revalidatePath("/plans");
+    revalidatePath(`/plans/${id}`);
+    redirect(`/plans/${id}`);
+}
