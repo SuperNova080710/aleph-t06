@@ -40,7 +40,7 @@ export async function createPlan(formData: FormData) {
             endDate,
         },
     });
-    
+
     revalidatePath("/plans");
 }
 
@@ -66,7 +66,15 @@ export async function updatePlan(formData: FormData) {
         throw new Error("필수 값이 없습니다.");
     }
 
-    const current = await prisma.plan.findUnique({ where: { id } });
+    const user = await requireUser();
+
+    const current = await prisma.plan.findFirst({
+        where: {
+            id,
+            userId: user.id,
+        },
+    });
+
     if (!current) {
         throw new Error("계획을 찾을 수 없습니다.");
     }
@@ -220,9 +228,26 @@ export async function deletePlan(formData: FormData) {
     const id = formData.get("id") as string;
     if (!id) throw new Error("계획 ID가 없습니다.");
 
+    const user = await requireUser();
+
+    const plan = await prisma.plan.findFirst({
+        where: {
+            id,
+            userId: user.id,
+        },
+    });
+
+    if (!plan) {
+        throw new Error("Plan not found");
+    }
+
     await prisma.plan.update({
-        where: { id },
-        data: { deletedAt: new Date() },
+        where: {
+            id: plan.id,
+        },
+        data: {
+            deletedAt: new Date(),
+        },
     });
 
     revalidatePath("/plans");
@@ -234,8 +259,21 @@ export async function restorePlan(formData: FormData) {
     const id = formData.get("id") as string;
     if (!id) throw new Error("계획 ID가 없습니다.");
 
+    const user = await requireUser();
+
+    const plan = await prisma.plan.findFirst({
+        where: {
+            id,
+            userId: user.id,
+        },
+    });
+
+    if (!plan) {
+        throw new Error("Plan not found");
+    }
+
     await prisma.plan.update({
-        where: { id },
+        where: { id: plan.id },
         data: { deletedAt: null },
     });
 
