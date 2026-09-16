@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache"; 
 import { redirect } from "next/navigation"; 
 import { TodoStatus } from "@prisma/client";
+import { requireUser } from "@/lib/require-user";
 
 export async function createPlan(formData: FormData) {
     const title = formData.get("title") as string;
@@ -20,21 +21,26 @@ export async function createPlan(formData: FormData) {
         ? new Date(formData.get("endDate") as string)
         : null;
 
-    if (!title || title.trim().length === 0) {
-        throw new Error("제목은 필수입니다.");
-    }
+        
+        if (!title || title.trim().length === 0) {
+            throw new Error("제목은 필수입니다.");
+        }
+        
+    const user = await requireUser();
 
-    await prisma.plan.create({
+    const plan = await prisma.plan.create({
         data: {
-            title: title.trim(),
-            description: description?.trim() || null,
+            userId: user.id,
+            title,
+            description,
             priority,
-            successCriteria: successCriteria?.trim() || null,
+            successCriteria,
             estimatedMinutes,
             startDate,
             endDate,
         },
     });
+    
     revalidatePath("/plans");
 }
 
