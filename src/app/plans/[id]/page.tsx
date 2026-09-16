@@ -10,6 +10,7 @@ import {
     restorePlan,
 } from "../actions";
 import { PlanDetailShell } from "@/components/plan-detail-shell";
+import { requireUser } from "@/lib/require-user";
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -28,16 +29,25 @@ export default async function PlanDetailPage({ params, searchParams }: Props) {
     const statusFilter = sp.status || "ALL";
     const sort = sp.sort || "priority";
 
-    const plan = await prisma.plan.findUnique({
-        where: { id },
+    const user = await requireUser();
+
+    const plan = await prisma.plan.findFirst({
+        where: {
+            id,
+            userId: user.id,
+        },
         include: {
-            versions: { orderBy: { changedAt: "desc" } },
+            versions: true,
             todos: {
                 include: {
-                    executionLogs: { orderBy: { createdAt: "desc" } },
+                    executionLogs: true,
                 },
             },
-            _count: { select: { todos: true } },
+            _count: {
+                select: {
+                    todos: true,
+                },
+            },
         },
     });
 
