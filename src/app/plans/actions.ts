@@ -132,6 +132,18 @@ export async function createTodo(formData: FormData) {
     if (!planId || !title) {
         throw new Error("필수 값이 없습니다.");
     }
+    const user = await requireUser();
+
+    const plan = await prisma.plan.findFirst({
+        where: {
+            id: planId,
+            userId: user.id,
+        },
+    });
+
+    if (!plan) {
+        throw new Error("계획을 찾을 수 없습니다.");
+    }
 
     await prisma.todo.create({
         data: {
@@ -157,8 +169,24 @@ export async function updateTodoStatus(formData: FormData) {
         throw new Error("필수 값이 없습니다.");
     }
 
+    const user = await requireUser();
+
+    const todo = await prisma.todo.findFirst({
+        where: {
+            id,
+            plan: {
+                id: planId,
+                userId: user.id,
+            },
+        },
+    });
+
+    if (!todo) {
+        throw new Error("Todo를 찾을 수 없습니다.");
+    }
+
     await prisma.todo.update({
-        where: { id },
+        where: { id: todo.id },
         data: {
             status,
             completedAt: status === "COMPLETED" ? new Date() : null,
@@ -176,8 +204,28 @@ export async function deleteTodo(formData: FormData) {
         throw new Error("필수 값이 없습니다.");
     }
 
-    await prisma.todo.delete({ where: { id } });
-    revalidatePath(`/plans/${planId}`);
+    const user = await requireUser();
+
+    const todo = await prisma.todo.findFirst({
+        where: {
+            id,
+            plan: {
+                id: planId,
+                userId: user.id,
+            },
+        },
+    });
+
+    if (!todo) {
+        throw new Error("Todo를 찾을 수 없습니다.");
+    }
+
+    await prisma.todo.delete({
+        where: {
+            id: todo.id,
+        },
+    });
+    
 }
 
 export async function createExecutionLog(formData: FormData) {
