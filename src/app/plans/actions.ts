@@ -226,6 +226,7 @@ export async function deleteTodo(formData: FormData) {
         },
     });
     
+    revalidatePath(`/plans/${planId}`);
 }
 
 export async function createExecutionLog(formData: FormData) {
@@ -247,10 +248,25 @@ export async function createExecutionLog(formData: FormData) {
     const startedAt = new Date(startedAtRaw);
     const endedAt = endedAtRaw ? new Date(endedAtRaw) : null;
 
-    // 실행 기록만 추가 (Todo/Plan 값은 절대 덮어쓰지 않음)
+    const user = await requireUser();
+
+    const todo = await prisma.todo.findFirst({
+        where: {
+            id: todoId,
+            plan: {
+                id: planId,
+                userId: user.id,
+            },
+        },
+    });
+
+    if (!todo) {
+        throw new Error("Todo를 찾을 수 없습니다.");
+    }
+
     await prisma.executionLog.create({
         data: {
-            todoId,
+            todoId: todo.id,
             startedAt,
             endedAt,
             actualMinutes,
@@ -265,11 +281,20 @@ export async function createExecutionLog(formData: FormData) {
 export async function getExecutionLogs(todoId: string) {
   if (!todoId) return [];
 
-  return prisma.executionLog.findMany({
-    where: { todoId },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
+    const user = await requireUser();
+
+    return prisma.executionLog.findMany({
+        where: {
+            todoId,
+            todo: {
+                plan: {
+                    userId: user.id,
+                },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+    });
 }
 
 export async function deletePlan(formData: FormData) {
