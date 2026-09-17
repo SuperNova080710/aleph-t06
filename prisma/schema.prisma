@@ -121,14 +121,17 @@ model ExecutionLog {
 // -----------------------------
 model Review {
   id          String    @id @default(cuid())
+  userId      String
   planId      String?
   periodStart DateTime? @db.Date
   periodEnd   DateTime? @db.Date
-  improvement String // 다음 계획으로 넘길 고칠 점 한 줄
+  improvement String
   createdAt   DateTime  @default(now())
 
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan Plan? @relation(fields: [planId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
   @@map("reviews")
 }
 
@@ -144,6 +147,7 @@ model User {
   sessions Session[]
   accounts Account[]
   plans    Plan[]
+  reviews Review[]
 
   @@map("user")
 }

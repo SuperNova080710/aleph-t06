@@ -1,14 +1,50 @@
 import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/require-user";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+    const user = await requireUser();
+
     const [plans, todos, executionLogs, planVersions, reviews] =
         await Promise.all([
-            prisma.plan.findMany({ orderBy: { createdAt: "asc" } }),
-            prisma.todo.findMany({ orderBy: { createdAt: "asc" } }),
-            prisma.executionLog.findMany({ orderBy: { createdAt: "asc" } }),
-            prisma.planVersion.findMany({ orderBy: { changedAt: "asc" } }),
-            prisma.review.findMany({ orderBy: { createdAt: "asc" } }),
+            prisma.plan.findMany({
+                where: {
+                    userId: user.id,
+                },
+                orderBy: { createdAt: "asc" },
+            }),
+            prisma.todo.findMany({
+                where: {
+                    plan: {
+                        userId: user.id,
+                    },
+                },
+                orderBy: { createdAt: "asc" },
+            }),
+            prisma.executionLog.findMany({
+                where: {
+                    todo: {
+                        plan: {
+                            userId: user.id,
+                        },
+                    },
+                },
+                orderBy: { createdAt: "asc" },
+            }),
+            prisma.planVersion.findMany({
+                where: {
+                    plan: {
+                        userId: user.id,
+                    },
+                },
+                orderBy: { changedAt: "asc" },
+            }),
+            prisma.review.findMany({
+                where: {
+                    userId: user.id,
+                },
+                orderBy: { createdAt: "asc" },
+            }),
         ]);
 
     const payload = {
