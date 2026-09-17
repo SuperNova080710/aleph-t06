@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireUser } from "@/lib/require-user";
 
 export async function createReview(formData: FormData) {
     const planId = (formData.get("planId") as string) || null;
@@ -17,9 +18,25 @@ export async function createReview(formData: FormData) {
         throw new Error("고칠 점을 입력해 주세요.");
     }
 
+    const user = await requireUser();
+
+    if (planId) {
+        const plan = await prisma.plan.findFirst({
+            where: {
+                id: planId,
+                userId: user.id,
+            },
+        });
+
+        if (!plan) {
+            throw new Error("계획을 찾을 수 없습니다.");
+        }
+    }
+
     await prisma.review.create({
         data: {
-            planId: planId || null,
+            userId: user.id,
+            planId,
             improvement,
             periodStart,
             periodEnd,

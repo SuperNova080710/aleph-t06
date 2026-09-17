@@ -3,16 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { PlanSidebar } from "@/components/plan-sidebar";
 import { auth } from "@/lib/auth";
 import { cache } from "react";
+import { requireUser } from "@/lib/require-user";
 
-const getPlansForSidebar = cache(async () => {
+const getPlansForSidebar = cache(async (userId: string) => {
   return prisma.plan.findMany({
-    orderBy: { createdAt: "desc" },
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
     select: {
       id: true,
       title: true,
       priority: true,
       deletedAt: true,
-      _count: { select: { todos: true } },
+      _count: {
+        select: {
+          todos: true,
+        },
+      },
     },
   });
 });
@@ -30,7 +40,8 @@ export default async function PlansLayout({
     throw new Error("Unauthorized");
   }
 
-  const plans = await getPlansForSidebar();
+  const user = await requireUser();
+  const plans = await getPlansForSidebar(user.id);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">

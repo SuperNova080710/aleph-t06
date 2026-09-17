@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createReview } from "./actions";
 import { ReviewShell } from "@/components/review-shell";
+import { requireUser } from "@/lib/require-user";
 import Link from "next/link";
 
 type Props = {
@@ -17,10 +18,15 @@ function startOfTodaySeoul() {
 }
 
 export default async function ReviewPage({ searchParams }: Props) {
+    const user = await requireUser();
+
     const sp = await searchParams;
     const focus = sp.focus || "all";
 
     const plans = await prisma.plan.findMany({
+        where: {
+            userId: user.id,
+        },
         include: {
             todos: {
                 include: { executionLogs: true },
@@ -30,6 +36,9 @@ export default async function ReviewPage({ searchParams }: Props) {
     });
 
     const reviews = await prisma.review.findMany({
+        where: {
+            userId: user.id,
+        },
         orderBy: { createdAt: "desc" },
         include: { plan: true },
     });
